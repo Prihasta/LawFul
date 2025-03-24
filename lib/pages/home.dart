@@ -1,6 +1,10 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/model/categoryModel.dart';
+import 'package:flutter_application_1/model/sliderModel.dart';
 import 'package:flutter_application_1/services/data.dart';
+import 'package:flutter_application_1/services/sliderData.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 
 class Home extends StatefulWidget {
@@ -13,10 +17,14 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
 List<Categorymodel> categories=[];
+List<Slidermodel> sliders=[];
+
+int activeIndex = 0;
 @override
   void initState() {
-  categories= getcategories();
     super.initState();
+    categories= getcategories();
+    sliders= getSliders();
   }
 
   @override
@@ -40,6 +48,7 @@ List<Categorymodel> categories=[];
       ),
       body: Container(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
           Container(
             margin: EdgeInsets.only(left: 10.0),
@@ -54,13 +63,95 @@ List<Categorymodel> categories=[];
                 categoryName: categories[index].categoryName,
               );
             }),
-          )
+          ),
+          SizedBox(
+            height: 30.0,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Breaking News", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18.0),),
+                Text("View All", style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w500, fontSize: 16.0),),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 20.0,
+          ),
+          CarouselSlider.builder(
+          itemCount: sliders.length, 
+          itemBuilder: (context, index, realIndex){
+            String? res= sliders[index].image;
+            String? res1= sliders[index].name;
+            return buildImage(res!, index, res1!);
+          }, 
+          options: CarouselOptions(
+            height: 250, 
+            autoPlay: true,
+            enlargeCenterPage: true, 
+            enlargeStrategy: CenterPageEnlargeStrategy.height,
+            onPageChanged: (index, reason){
+            
+              setState(() {
+                activeIndex= index;
+              });
+            })),
+            SizedBox(height: 30.0,),
+            Center(child: buildIndicator()),
+            SizedBox(
+              height: 30.0,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+              child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Breaking News", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18.0),),
+                Text("View All", style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w500, fontSize: 16.0),),
+              ],
+            ),
+          ),
         ],
       ),
     ),
   );
 }
+  Widget buildImage(String image, int index, String name) => Container(
+   margin: EdgeInsets.symmetric(horizontal: 5.0),
+    child: Stack(
+      children: [
+      ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.asset(
+          image, 
+          height: 250,
+          fit: BoxFit.cover, 
+          width: MediaQuery.of(context).size.width,
+        ),
+      ), 
+      Container(
+        height: 250,
+        padding: EdgeInsets.only(left: 10.0),
+        margin: EdgeInsets.only(top: 170.0),
+        width:  MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10) ) ),
+      child: Text(name, style: TextStyle(
+        color: Colors.white, 
+        fontSize: 18.0, 
+        fontWeight: FontWeight.bold),
+        ),
+      )
+ ] ));
+      Widget buildIndicator() => AnimatedSmoothIndicator(
+        activeIndex: activeIndex, 
+        count: sliders.length,
+        effect: ExpandingDotsEffect(dotWidth: 13, dotHeight: 13, activeDotColor: Colors.blue),
+        );
 }
+
+
 
 class CategoryTile extends StatelessWidget {
   final image, categoryName;
