@@ -9,6 +9,9 @@ import 'package:flutter_application_1/services/data.dart';
 import 'package:flutter_application_1/services/news.dart';
 import 'package:flutter_application_1/services/sliderData.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:flutter_application_1/services/sliderView.dart';
+
+
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -19,7 +22,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<Categorymodel> categories = [];
-  List<Slidermodel> sliders = [];
+  List<SliderModel> sliders = [];
   List<Articlemodel> article = [];
   bool _loading = true;
 
@@ -112,7 +115,8 @@ class _HomeState extends State<Home> {
                         itemBuilder: (context, index, realIndex) {
                           String? res = sliders[index].image;
                           String? res1 = sliders[index].name;
-                          return buildImage(res!, index, res1!);
+                          String? res2 = sliders[index].description; // Add this line to get the description
+                          return buildImage(res!, index, res1!, res2!); // Pass the description as the fourth parameter
                         },
                         options: CarouselOptions(
                           height: 250,
@@ -176,7 +180,18 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget buildImage(String image, int index, String name) => Container(
+Widget buildImage(String image, int index, String name, String description) => GestureDetector(
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SliderDetailView(
+          slider: getSliders()[index],
+        ),
+      ),
+    );
+  },
+  child: Container(
     margin: EdgeInsets.symmetric(horizontal: 5.0),
     child: Stack(
       children: [
@@ -191,28 +206,44 @@ class _HomeState extends State<Home> {
         ),
         Container(
           height: 250,
-          padding: EdgeInsets.only(left: 10.0),
-          margin: EdgeInsets.only(top: 170.0),
+          padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
+          margin: EdgeInsets.only(top: 140.0), // Moved higher to accommodate description
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-            color: Colors.black26,
+            color: Colors.black45, // Slightly darker for better readability
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(10),
               bottomRight: Radius.circular(10),
             ),
           ),
-          child: Text(
-            name,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18.0,
-              fontWeight: FontWeight.bold,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 5.0),
+              Text(
+                description,
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 12.0,
+                ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
         ),
       ],
     ),
-  );
+  )
+);
   Widget buildIndicator() => AnimatedSmoothIndicator(
     activeIndex: activeIndex,
     count: sliders.length,
