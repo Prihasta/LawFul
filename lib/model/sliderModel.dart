@@ -1,7 +1,14 @@
-class Slidermodel {
+import 'package:flutter/material.dart';
 
-  String? image;
-  String? name;
-
-  Slidermodel({required this.image, required this.name});
+class SliderModel {
+  final String? image;
+  final String? name;
+  final String? description;
+  
+  // Constructor with optional description parameter
+  SliderModel({
+    this.image,
+    this.name,
+    this.description,
+  });
 }
